@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+<div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Tutoriais</h2>
+    <form action="/videos" method="GET" class="mb-6 flex space-x-4">
+        <select name="categoria" class="p-2 border rounded">
+            <option value="">Todas as Categorias</option>
+            <% categorias.forEach(categoria => { %>
+                <option value="<%= categoria.id %>" <%= Number(categoriaSelecionada) === categoria.id ? 'selected' : '' %>><%= categoria.nome %></option>
+            <% }) %>
+        </select>
+        <button type="submit" class="bg-green-600 text-white p-2 rounded">Filtrar</button>
+    </form>
+    <% if (erro) { %>
+        <p class="text-red-600 mb-4"><%= erro %></p>
+    <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <% if (videos.length > 0) { %>
+                <% videos.forEach(video => { %>
+                    <div class="bg-white rounded-lg shadow">
+                        <a href="/video/<%= video.id %>">
+                            <video class="w-full h-48 object-cover rounded-t-lg" src="<%= video.caminho_arquivo %>" muted></video>
+                        </a>
+                        <div class="p-4">
+                            <h3 class="text-lg font-bold"><%= video.titulo %></h3>
+                            <p class="text-gray-600">Por <%= video.nome_usuario %></p>
+                            <p class="text-gray-600"><%= video.contagem_visualizacoes || 0 %> visualizações</p>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-600">Nenhum vídeo encontrado.</p>
+            <% } %>
+        </div>
+    <% } %>
+</div>

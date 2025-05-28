@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+<div class="cornerCraft p-3">
+    <main class="main">
+        <section class="hero">
+            <h2 class="heroTitle text-2xl font-bold text-gray-800 mb-4">Aprenda e Compartilhe Artesanato</h2>
+            <p class="heroText text-gray-600 mb-6">
+                Tutoriais em vídeo para aprender diferentes técnicas de artesanato brasileiro. Compartilhe suas criações e conecte-se com outros artesãos.
+            </p>
+            <a href="/videos" class="heroButton bg-green-600 text-white px-6 py-3 rounded">Explorar Tutoriais</a>
+        </section>
+
+        <section class="categories">
+            <h3 class="categoriesTitle text-xl font-bold text-gray-800 mt-8 mb-4">Categorias</h3>
+            <div class="categoriesList flex space-x-4 overflow-x-auto pb-4">
+                <% categorias.forEach(categoria => { %>
+                    <a href="/categoria/<%= categoria.id %>" class="category bg-gray-200 px-4 py-2 rounded whitespace-nowrap"><%= categoria.nome %></a>
+                <% }) %>
+            </div>
+        </section>
+    </main>
+</div>

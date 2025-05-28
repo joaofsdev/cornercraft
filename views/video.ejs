@@ -1,0 +1,64 @@
+<!-- Arquivo: /views/video.ejs -->
+<%- include('partials/header') %>
+<div class="p-6 flex flex-col md:flex-row gap-6">
+    <% if (erro) { %>
+        <p class="text-red-600 mb-4"><%= erro %></p>
+    <% } else { %>
+        <div class="md:w-3/4">
+            <video controls class="w-full rounded-lg" src="<%= video.caminho_arquivo %>">
+                Seu navegador não suporta o elemento de vídeo.
+            </video>
+            <h2 class="text-xl font-bold text-gray-800 mt-4"><%= video.titulo %></h2>
+            <p class="text-gray-600">Por <%= video.nome_usuario || 'Usuário Desconhecido' %> • <%= video.contagem_visualizacoes %> visualizações</p>
+            
+            <div class="flex space-x-4 my-4">
+                <form action="/videos/video/<%= video.id %>/like" method="POST">
+                    <button type="submit" class="bg-gray-200 px-4 py-2 rounded">👍 <%= likes %></button>
+                </form>
+                <form action="/videos/video/<%= video.id %>/deslike" method="POST">
+                    <button type="submit" class="bg-gray-200 px-4 py-2 rounded">👎 <%= deslikes %></button>
+                </form>
+            </div>
+
+            <div class="mt-6">
+                <h3 class="text-lg font-bold mb-4">Comentários</h3>
+                <% if (usuario) { %>
+                    <form action="/videos/video/<%= video.id %>/comentario" method="POST" class="mb-4">
+                        <textarea name="comentario" class="w-full p-2 border rounded" placeholder="Adicione um comentário..." required></textarea>
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded mt-2">Comentar</button>
+                    </form>
+                <% } else { %>
+                    <p class="text-gray-600 mb-4">Faça <a href="/auth/login" class="text-green-600">login</a> para comentar.</p>
+                <% } %>
+                <% if (comentarios && comentarios.length > 0) { %>
+                    <% comentarios.forEach(comentario => { %>
+                        <div class="border-b py-2">
+                            <p class="font-bold"><%= comentario.nome_usuario || 'Usuário Desconhecido' %></p>
+                            <p class="text-gray-600"><%= comentario.comentario %></p>
+                            <p class="text-sm text-gray-500"><%= comentario.criado_em %></p>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-gray-600">Nenhum comentário ainda.</p>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="md:w-1/4">
+            <h3 class="text-lg font-bold mb-4">Vídeos Sugeridos</h3>
+            <% if (videosSugeridos && videosSugeridos.length > 0) { %>
+                <% videosSugeridos.forEach(sugerido => { %>
+                    <div class="mb-4">
+                        <a href="/videos/video/<%= sugerido.id %>">
+                            <video class="w-full h-24 object-cover rounded" src="<%= sugerido.caminho_arquivo %>" muted></video>
+                        </a>
+                        <h4 class="text-sm font-bold mt-2"><%= sugerido.titulo %></h4>
+                        <p class="text-gray-600 text-sm">Por <%= sugerido.nome_usuario || 'Usuário Desconhecido' %></p>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-600">Nenhum vídeo sugerido.</p>
+            <% } %>
+        </div>
+    <% } %>
+</div>

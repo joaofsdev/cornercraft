@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+<div class="p-6">
+    <% if (erro) { %>
+        <p class="text-red-600 mb-4"><%= erro %></p>
+    <% } else { %>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4"><%= categoria.nome %></h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <% if (videos.length > 0) { %>
+                <% videos.forEach(video => { %>
+                    <div class="bg-white rounded-lg shadow">
+                        <a href="/video/<%= video.id %>">
+                            <video class="w-full h-48 object-cover rounded-t-lg" src="<%= video.caminho_arquivo %>" muted></video>
+                        </a>
+                        <div class="p-4">
+                            <h3 class="text-lg font-bold"><%= video.titulo %></h3>
+                            <p class="text-gray-600">Por <%= video.nome_usuario %></p>
+                            <p class="text-gray-600"><%= video.contagem_visualizacoes || 0 %> visualizações</p>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="text-gray-600">Nenhum vídeo encontrado nesta categoria.</p>
+            <% } %>
+        </div>
+    <% } %>
+</div>

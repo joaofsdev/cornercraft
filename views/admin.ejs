@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+<div class="p-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Painel ADM</h2>
+    <% if (erro) { %>
+        <p class="text-red-600 mb-4"><%= erro %></p>
+    <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-bold">Usuários</h3>
+                <p class="text-2xl"><%= dados.total_usuarios || 0 %></p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-bold">Tutoriais</h3>
+                <p class="text-2xl"><%= dados.total_videos || 0 %></p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-bold">Views da página</h3>
+                <p class="text-2xl"><%= dados.total_visualizacoes || 0 %></p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-lg font-bold">Engajamento</h3>
+                <p class="text-2xl">86%</p>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="text-lg font-bold mb-4">Categorias Populares</h3>
+            <div>
+                <% if (dados.categorias_populares && Array.isArray(dados.categorias_populares) && dados.categorias_populares.length > 0) { %>
+                    <% dados.categorias_populares.forEach(cat => { %>
+                        <% const maxContagem = Number(dados.categorias_populares[0]?.contagem) || 1; %>
+                        <% const contagemAtual = Number(cat.contagem) || 0; %>
+                        <% const porcentagem = isNaN((contagemAtual / maxContagem) * 100) ? 0 : (contagemAtual / maxContagem) * 100; %>
+                        <div class="mb-2">
+                            <span><%= cat.nome_categoria %>: <%= contagemAtual %></span>
+                            <div class="bg-gray-200 h-4 rounded overflow-hidden">
+                                <div class="bg-green-600 h-4 rounded"></div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-gray-600">Nenhuma categoria encontrada.</p>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+</div>

@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+<div class="flex justify-center items-center min-h-screen bg-green-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 class="text-xl font-bold text-green-800 mb-4">Publicar Novo Tutorial</h2>
+        <form action="/videos/publicar" method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block text-gray-700">Título</label>
+                <input type="text" name="titulo" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Descrição</label>
+                <textarea name="descricao" class="w-full p-2 border rounded"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Categorias</label>
+                <select name="categorias" multiple class="w-full p-2 border rounded" required>
+                    <% categorias.forEach(cat => { %>
+                        <option value="<%= cat.id %>"><%= cat.nome %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700">Vídeo</label>
+                <input type="file" name="video" accept="video/*" class="w-full p-2 border rounded" required>
+            </div>
+            <% if (erro) { %>
+                <p class="text-red-600 mb-4"><%= erro %></p>
+            <% } %>
+            <button type="submit" class="w-full bg-green-600 text-white p-2 rounded">Publicar</button>
+        </form>
+    </div>
+</div>
