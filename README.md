@@ -42,7 +42,7 @@ cd cornercraft
 2. **Instale as dependências do backend:**
 
 ```bash
-npm install express ejs mysql2 dotenv express-session bcrypt tailwindcss
+npm install express ejs mysql2 dotenv express-session bcrypt
 ```
 
 3. **Configure as variáveis de ambiente:**
