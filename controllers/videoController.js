@@ -1,6 +1,7 @@
 const path = require('path');
 
-exports.mostrarVideos = (req, res) => {
+// Função para mostrar a lista de vídeos
+const mostrarVideos = (req, res) => {
     const db = req.app.get('db');
     const categoriaSelecionada = req.query.categoria || '';
     let query = 'SELECT v.*, u.nome AS nome_usuario FROM videos v JOIN usuarios u ON v.usuario_id = u.id';
@@ -29,7 +30,8 @@ exports.mostrarVideos = (req, res) => {
     });
 };
 
-exports.mostrarPublicar = (req, res) => {
+// Função para mostrar o formulário de publicação
+const mostrarPublicar = (req, res) => {
     if (!req.session.usuario) {
         return res.redirect('/auth/login');
     }
@@ -43,16 +45,19 @@ exports.mostrarPublicar = (req, res) => {
     });
 };
 
-exports.processarPublicar = (req, res) => {
+// Função para processar a publicação de um vídeo
+const processarPublicar = (req, res) => {
     if (!req.session.usuario) {
         return res.redirect('/auth/login');
     }
 
     const { titulo, descricao, categorias } = req.body;
-    const arquivo = req.file;
+    const videoFile = req.files['video'] ? req.files['video'][0] : null;
+    const thumbnailFile = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
     const usuarioId = req.session.usuario.id;
 
-    if (!titulo || !arquivo || !categorias) {
+    // Validação dos campos obrigatórios
+    if (!titulo || !videoFile || !categorias) {
         const db = req.app.get('db');
         db.query('SELECT * FROM categorias', (erro, categorias) => {
             if (erro) return res.status(400).render('publicar', { usuario: req.session.usuario, categorias: [], erro: 'Erro ao buscar categorias' });
@@ -61,31 +66,37 @@ exports.processarPublicar = (req, res) => {
         return;
     }
 
-    const caminhoArquivo = `/uploads/${arquivo.filename}`;
+    const caminhoArquivo = videoFile ? `/uploads/${videoFile.filename}` : null;
+    const caminhoThumbnail = thumbnailFile ? `/uploads/${thumbnailFile.filename}` : null;
+
     const db = req.app.get('db');
 
-    db.query('INSERT INTO videos (usuario_id, titulo, descricao, caminho_arquivo) VALUES (?, ?, ?, ?)', 
-        [usuarioId, titulo, descricao || '', caminhoArquivo], (erro, resultado) => {
-        if (erro) {
-            console.error('Erro ao inserir vídeo:', erro);
-            return res.status(500).render('publicar', { usuario: req.session.usuario, categorias: [], erro: 'Erro ao publicar vídeo' });
-        }
-
-        const videoId = resultado.insertId;
-        const categoriasArray = Array.isArray(categorias) ? categorias : [categorias];
-        const valores = categoriasArray.map(catId => [videoId, catId]);
-
-        db.query('INSERT INTO video_categorias (video_id, categoria_id) VALUES ?', [valores], (erro) => {
+    db.query(
+        'INSERT INTO videos (usuario_id, titulo, descricao, caminho_arquivo, thumbnail) VALUES (?, ?, ?, ?, ?)',
+        [usuarioId, titulo, descricao || '', caminhoArquivo, caminhoThumbnail || ''],
+        (erro, resultado) => {
             if (erro) {
-                console.error('Erro ao associar categorias:', erro);
-                return res.status(500).render('publicar', { usuario: req.session.usuario, categorias: [], erro: 'Erro ao associar categorias' });
+                console.error('Erro ao inserir vídeo:', erro);
+                return res.status(500).render('publicar', { usuario: req.session.usuario, categorias: [], erro: 'Erro ao publicar vídeo' });
             }
-            res.redirect('/videos');
-        });
-    });
+
+            const videoId = resultado.insertId;
+            const categoriasArray = Array.isArray(categorias) ? categorias : [categorias];
+            const valores = categoriasArray.map(catId => [videoId, catId]);
+
+            db.query('INSERT INTO video_categorias (video_id, categoria_id) VALUES ?', [valores], (erro) => {
+                if (erro) {
+                    console.error('Erro ao associar categorias:', erro);
+                    return res.status(500).render('publicar', { usuario: req.session.usuario, categorias: [], erro: 'Erro ao associar categorias' });
+                }
+                res.redirect('/videos');
+            });
+        }
+    );
 };
 
-exports.mostrarCategoria = (req, res) => {
+// Função para mostrar vídeos de uma categoria específica
+const mostrarCategoria = (req, res) => {
     const db = req.app.get('db');
     const categoriaId = req.params.id;
 
@@ -112,11 +123,12 @@ exports.mostrarCategoria = (req, res) => {
     });
 };
 
-exports.mostrarVideo = (req, res) => {
+// Função para mostrar um vídeo específico
+const mostrarVideo = (req, res) => {
     const db = req.app.get('db');
     const videoId = req.params.id;
 
-    console.log(`Acessando vídeo com ID: ${videoId}`); 
+    console.log(`Acessando vídeo com ID: ${videoId}`);
 
     db.query('UPDATE videos SET contagem_visualizacoes = contagem_visualizacoes + 1 WHERE id = ?', [videoId], (erro) => {
         if (erro) {
@@ -124,91 +136,150 @@ exports.mostrarVideo = (req, res) => {
             return res.status(500).render('video', { usuario: req.session.usuario, video: null, videosSugeridos: [], comentarios: [], likes: 0, deslikes: 0, erro: 'Erro ao carregar vídeo' });
         }
 
-        db.query('SELECT v.*, u.nome AS nome_usuario FROM videos v LEFT JOIN usuarios u ON v.usuario_id = u.id WHERE v.id = ?', [videoId], (erro, video) => {
-            if (erro) {
-                console.error('Erro ao buscar vídeo:', erro);
-                return res.status(500).render('video', { usuario: req.session.usuario, video: null, videosSugeridos: [], comentarios: [], likes: 0, deslikes: 0, erro: 'Erro ao buscar vídeo' });
-            }
-
-            console.log('Resultado da busca do vídeo:', video); 
-
-            if (!video[0]) {
-                console.log(`Vídeo com ID ${videoId} não encontrado`);
-                return res.status(404).render('404', { usuario: req.session.usuario, erro: 'Vídeo não encontrado' });
-            }
-
-            console.log('Caminho do arquivo de vídeo:', video[0].caminho_arquivo); 
-
-            db.query('SELECT v.*, u.nome AS nome_usuario FROM videos v LEFT JOIN usuarios u ON v.usuario_id = u.id WHERE v.id != ? ORDER BY RAND() LIMIT 5', [videoId], (erro, videosSugeridos) => {
+        db.query(
+            'SELECT v.*, u.nome AS nome_usuario, c.nome AS categoria FROM videos v LEFT JOIN usuarios u ON v.usuario_id = u.id LEFT JOIN video_categorias vc ON v.id = vc.video_id LEFT JOIN categorias c ON vc.categoria_id = c.id WHERE v.id = ?',
+            [videoId],
+            (erro, video) => {
                 if (erro) {
-                    console.error('Erro ao buscar vídeos sugeridos:', erro);
-                    videosSugeridos = [];
+                    console.error('Erro ao buscar vídeo:', erro);
+                    return res.status(500).render('video', { usuario: req.session.usuario, video: null, videosSugeridos: [], comentarios: [], likes: 0, deslikes: 0, erro: 'Erro ao buscar vídeo' });
                 }
 
-                db.query('SELECT c.*, u.nome AS nome_usuario FROM comentarios c LEFT JOIN usuarios u ON c.usuario_id = u.id WHERE c.video_id = ? ORDER BY c.criado_em DESC', [videoId], (erro, comentarios) => {
-                    if (erro) {
-                        console.error('Erro ao buscar comentários:', erro);
-                        comentarios = [];
-                    }
+                console.log('Resultado da busca do vídeo:', video);
 
-                    db.query('SELECT tipo, COUNT(*) as total FROM likes WHERE video_id = ? GROUP BY tipo', [videoId], (erro, resultados) => {
+                if (!video[0]) {
+                    console.log(`Vídeo com ID ${videoId} não encontrado`);
+                    return res.status(404).render('404', { usuario: req.session.usuario, erro: 'Vídeo não encontrado' });
+                }
+
+                console.log('Caminho do arquivo de vídeo:', video[0].caminho_arquivo);
+
+                // Busca vídeos sugeridos (mesma categoria, exceto o vídeo atual)
+                db.query(
+                    'SELECT v.*, u.nome AS nome_usuario FROM videos v LEFT JOIN usuarios u ON v.usuario_id = u.id LEFT JOIN video_categorias vc ON v.id = vc.video_id WHERE vc.categoria_id IN (SELECT categoria_id FROM video_categorias WHERE video_id = ?) AND v.id != ? ORDER BY RAND() LIMIT 5',
+                    [videoId, videoId],
+                    (erro, videosSugeridos) => {
                         if (erro) {
-                            console.error('Erro ao buscar likes/deslikes:', erro);
-                            return res.status(500).render('video', { usuario: req.session.usuario, video: null, videosSugeridos: [], comentarios: [], likes: 0, deslikes: 0, erro: 'Erro ao carregar vídeo' });
+                            console.error('Erro ao buscar vídeos sugeridos:', erro);
+                            videosSugeridos = [];
                         }
 
-                        const likes = resultados?.find(r => r.tipo === 'like')?.total || 0;
-                        const deslikes = resultados?.find(r => r.tipo === 'deslike')?.total || 0;
+                        db.query(
+                            'SELECT c.*, u.nome AS nome_usuario FROM comentarios c LEFT JOIN usuarios u ON c.usuario_id = u.id WHERE c.video_id = ? ORDER BY c.criado_em DESC',
+                            [videoId],
+                            (erro, comentarios) => {
+                                if (erro) {
+                                    console.error('Erro ao buscar comentários:', erro);
+                                    comentarios = [];
+                                }
 
-                        console.log('Renderizando vídeo:', video[0]); 
+                                db.query(
+                                    'SELECT tipo, COUNT(*) as total FROM likes WHERE video_id = ? GROUP BY tipo',
+                                    [videoId],
+                                    (erro, resultados) => {
+                                        if (erro) {
+                                            console.error('Erro ao buscar likes/deslikes:', erro);
+                                            return res.status(500).render('video', { usuario: req.session.usuario, video: null, videosSugeridos: [], comentarios: [], likes: 0, deslikes: 0, erro: 'Erro ao carregar vídeo' });
+                                        }
 
-                        res.render('video', { 
-                            usuario: req.session.usuario, 
-                            video: video[0], 
-                            videosSugeridos: videosSugeridos || [], 
-                            comentarios: comentarios || [], 
-                            likes, 
-                            deslikes, 
-                            erro: null 
-                        });
-                    });
-                });
-            });
-        });
+                                        const likes = resultados?.find(r => r.tipo === 'like')?.total || 0;
+                                        const deslikes = resultados?.find(r => r.tipo === 'deslike')?.total || 0;
+
+                                        console.log('Renderizando vídeo:', video[0]);
+
+                                        res.render('video', {
+                                            usuario: req.session.usuario,
+                                            video: video[0],
+                                            videosSugeridos: videosSugeridos || [],
+                                            comentarios: comentarios || [],
+                                            likes,
+                                            deslikes,
+                                            erro: null
+                                        });
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        );
     });
 };
 
-exports.adicionarComentario = (req, res) => {
+// Função para adicionar um comentário
+const adicionarComentario = (req, res) => {
     if (!req.session.usuario) return res.redirect('/auth/login');
 
     const videoId = req.params.id;
     const { comentario } = req.body;
     const usuarioId = req.session.usuario.id;
 
-    if (!comentario) return res.redirect(`/video/${videoId}`);
+    if (!comentario) return res.redirect(`/videos/video/${videoId}`);
 
     const db = req.app.get('db');
-    db.query('INSERT INTO comentarios (video_id, usuario_id, comentario) VALUES (?, ?, ?)', [videoId, usuarioId, comentario], (erro) => {
-        if (erro) {
-            console.error('Erro ao adicionar comentário:', erro);
+    db.query(
+        'INSERT INTO comentarios (video_id, usuario_id, comentario, criado_em) VALUES (?, ?, ?, NOW())',
+        [videoId, usuarioId, comentario],
+        (erro) => {
+            if (erro) {
+                console.error('Erro ao adicionar comentário:', erro);
+            }
+            res.redirect(`/videos/video/${videoId}`);
         }
-        res.redirect(`/video/${videoId}`);
-    });
+    );
 };
 
-exports.darLike = (req, res) => {
-    if (!req.session.usuario) return res.redirect('/auth/login');
+// Função para dar like em um vídeo
+const darLike = (req, res) => {
+    if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
 
     const videoId = req.params.id;
     const usuarioId = req.session.usuario.id;
-    const tipo = req.path.includes('like') ? 'like' : 'deslike';
 
     const db = req.app.get('db');
-    db.query('INSERT INTO likes (video_id, usuario_id, tipo) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE tipo = ?', 
-        [videoId, usuarioId, tipo, tipo], (erro) => {
-        if (erro) {
-            console.error('Erro ao adicionar like/deslike:', erro);
+    db.query(
+        'INSERT INTO likes (video_id, usuario_id, tipo) VALUES (?, ?, "like") ON DUPLICATE KEY UPDATE tipo = "like"',
+        [videoId, usuarioId],
+        (erro) => {
+            if (erro) {
+                console.error('Erro ao adicionar like:', erro);
+                return res.json({ success: false });
+            }
+            res.json({ success: true });
         }
-        res.redirect(`/video/${videoId}`);
-    });
+    );
+};
+
+// Função para dar deslike em um vídeo
+const darDeslike = (req, res) => {
+    if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
+
+    const videoId = req.params.id;
+    const usuarioId = req.session.usuario.id;
+
+    const db = req.app.get('db');
+    db.query(
+        'INSERT INTO likes (video_id, usuario_id, tipo) VALUES (?, ?, "deslike") ON DUPLICATE KEY UPDATE tipo = "deslike"',
+        [videoId, usuarioId],
+        (erro) => {
+            if (erro) {
+                console.error('Erro ao adicionar deslike:', erro);
+                return res.json({ success: false });
+            }
+            res.json({ success: true });
+        }
+    );
+};
+
+// Exportar todas as funções
+module.exports = {
+    mostrarVideos,
+    mostrarPublicar,
+    processarPublicar,
+    mostrarCategoria,
+    mostrarVideo,
+    adicionarComentario,
+    darLike,
+    darDeslike
 };
