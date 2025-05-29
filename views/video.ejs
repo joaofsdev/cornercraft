@@ -1,64 +1,83 @@
-<!-- Arquivo: /views/video.ejs -->
+<!-- Arquivo: views/video.ejs -->
 <%- include('partials/header') %>
-<div class="p-6 flex flex-col md:flex-row gap-6">
-    <% if (erro) { %>
-        <p class="text-red-600 mb-4"><%= erro %></p>
-    <% } else { %>
-        <div class="md:w-3/4">
-            <video controls class="w-full rounded-lg" src="<%= video.caminho_arquivo %>">
-                Seu navegador não suporta o elemento de vídeo.
-            </video>
-            <h2 class="text-xl font-bold text-gray-800 mt-4"><%= video.titulo %></h2>
-            <p class="text-gray-600">Por <%= video.nome_usuario || 'Usuário Desconhecido' %> • <%= video.contagem_visualizacoes %> visualizações</p>
-            
-            <div class="flex space-x-4 my-4">
-                <form action="/videos/video/<%= video.id %>/like" method="POST">
-                    <button type="submit" class="bg-gray-200 px-4 py-2 rounded">👍 <%= likes %></button>
-                </form>
-                <form action="/videos/video/<%= video.id %>/deslike" method="POST">
-                    <button type="submit" class="bg-gray-200 px-4 py-2 rounded">👎 <%= deslikes %></button>
-                </form>
+<div class="min-h-screen bg-gray-100 p-6">
+    <!-- Conteúdo do Vídeo -->
+    <% if (video) { %>
+        <div class="max-w-4xl mx-auto">
+            <div class="relative w-full" style="padding-bottom: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                <video controls class="absolute top-0 left-0 w-full h-full object-contain bg-black rounded-lg" src="<%= video.caminho_arquivo %>" poster="<%= video.thumbnail || '/uploads/placeholder.jpg' %>">
+                    Seu navegador não suporta o elemento de vídeo.
+                </video>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800"><%= video.titulo %></h2>
+                <div class="flex space-x-2">
+                </div>
+            </div>
+            <div class="flex items-center mt-2 text-gray-600">
+                <span><%= video.contagem_visualizacoes || 0 %> visualizações</span>
+                <span class="mx-2">•</span>
+                <span>Publicado em <%= video.criado_em ? new Date(video.criado_em).toLocaleDateString() : '29/05/2025' %></span>
+                <span class="mx-2">•</span>
+                <span><%= video.categoria || 'Sem categoria' %></span>
+            </div>
+            <div class="flex items-center mt-2">
+                <span class="font-medium"><%= video.nome_usuario || 'Usuário Desconhecido' %></span>
             </div>
 
+            <!-- Descrição e Seções -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div class="md:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Descrição</h3>
+                    <p class="text-gray-600"><%= video.descricao || 'Este tutorial vai te ensinar os fundamentos do crochê, desde como segurar a agulha e o fio até os pontos básicos que são a base para qualquer projeto. Perfeito para quem está começando no mundo do crochê.' %></p>
+                </div>
+            </div>
+
+            <!-- Tutoriais Relacionados -->
             <div class="mt-6">
-                <h3 class="text-lg font-bold mb-4">Comentários</h3>
-                <% if (usuario) { %>
-                    <form action="/videos/video/<%= video.id %>/comentario" method="POST" class="mb-4">
-                        <textarea name="comentario" class="w-full p-2 border rounded" placeholder="Adicione um comentário..." required></textarea>
-                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded mt-2">Comentar</button>
-                    </form>
-                <% } else { %>
-                    <p class="text-gray-600 mb-4">Faça <a href="/auth/login" class="text-green-600">login</a> para comentar.</p>
-                <% } %>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Tutoriais Relacionados</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <% if (videosSugeridos && videosSugeridos.length > 0) { %>
+                        <% videosSugeridos.forEach(relVideo => { %>
+                            <div class="flex items-center">
+                                <img src="<%= relVideo.thumbnail || '/uploads/placeholder.jpg' %>" alt="<%= relVideo.titulo %>" class="w-20 h-20 object-cover rounded mr-2">
+                                <div>
+                                    <a href="/videos/video/<%= relVideo.id %>" class="text-gray-800 hover:underline"><%= relVideo.titulo %></a>
+                                    <p class="text-gray-600 text-sm"><%= relVideo.nome_usuario || 'Usuário Desconhecido' %></p>
+                                    <p class="text-gray-600 text-sm"><%= relVideo.contagem_visualizacoes || 0 %> visualizações</p>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="text-gray-600">Nenhum tutorial relacionado.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Comentários -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Comentários <%= comentarios ? `(${comentarios.length})` : '(0)' %></h3>
                 <% if (comentarios && comentarios.length > 0) { %>
                     <% comentarios.forEach(comentario => { %>
-                        <div class="border-b py-2">
-                            <p class="font-bold"><%= comentario.nome_usuario || 'Usuário Desconhecido' %></p>
-                            <p class="text-gray-600"><%= comentario.comentario %></p>
-                            <p class="text-sm text-gray-500"><%= comentario.criado_em %></p>
+                        <div class="flex items-start mb-4">
+                            <div>
+                                <p class="text-gray-800 font-medium"><%= comentario.nome_usuario || 'Usuário Desconhecido' %></p>
+                                <p class="text-gray-600 text-sm"><%= comentario.criado_em ? new Date(comentario.criado_em).toLocaleDateString() : '29/05/2025' %></p>
+                                <p class="text-gray-600"><%= comentario.comentario %></p>
+                            </div>
                         </div>
                     <% }) %>
                 <% } else { %>
                     <p class="text-gray-600">Nenhum comentário ainda.</p>
                 <% } %>
+                <form action="/videos/video/<%= video.id %>/comentario" method="POST" class="mt-4">
+                    <textarea name="comentario" class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Escreva seu comentário..." required></textarea>
+                    <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mt-2">Adicionar comentário</button>
+                </form>
             </div>
         </div>
-
-        <div class="md:w-1/4">
-            <h3 class="text-lg font-bold mb-4">Vídeos Sugeridos</h3>
-            <% if (videosSugeridos && videosSugeridos.length > 0) { %>
-                <% videosSugeridos.forEach(sugerido => { %>
-                    <div class="mb-4">
-                        <a href="/videos/video/<%= sugerido.id %>">
-                            <video class="w-full h-24 object-cover rounded" src="<%= sugerido.caminho_arquivo %>" muted></video>
-                        </a>
-                        <h4 class="text-sm font-bold mt-2"><%= sugerido.titulo %></h4>
-                        <p class="text-gray-600 text-sm">Por <%= sugerido.nome_usuario || 'Usuário Desconhecido' %></p>
-                    </div>
-                <% }) %>
-            <% } else { %>
-                <p class="text-gray-600">Nenhum vídeo sugerido.</p>
-            <% } %>
-        </div>
+    <% } else { %>
+        <p class="text-red-600 text-center">Vídeo não encontrado.</p>
     <% } %>
 </div>
+<%- include('partials/footer') %>
