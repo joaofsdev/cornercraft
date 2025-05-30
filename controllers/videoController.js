@@ -1,6 +1,5 @@
 const path = require('path');
 
-// Função para mostrar a lista de vídeos
 const mostrarVideos = (req, res) => {
     const db = req.app.get('db');
     const categoriaSelecionada = req.query.categoria || '';
@@ -30,7 +29,6 @@ const mostrarVideos = (req, res) => {
     });
 };
 
-// Função para mostrar o formulário de publicação
 const mostrarPublicar = (req, res) => {
     if (!req.session.usuario) {
         return res.redirect('/auth/login');
@@ -45,7 +43,6 @@ const mostrarPublicar = (req, res) => {
     });
 };
 
-// Função para processar a publicação de um vídeo
 const processarPublicar = (req, res) => {
     if (!req.session.usuario) {
         return res.redirect('/auth/login');
@@ -56,7 +53,6 @@ const processarPublicar = (req, res) => {
     const thumbnailFile = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
     const usuarioId = req.session.usuario.id;
 
-    // Validação dos campos obrigatórios
     if (!titulo || !videoFile || !categorias) {
         const db = req.app.get('db');
         db.query('SELECT * FROM categorias', (erro, categorias) => {
@@ -95,7 +91,6 @@ const processarPublicar = (req, res) => {
     );
 };
 
-// Função para mostrar vídeos de uma categoria específica
 const mostrarCategoria = (req, res) => {
     const db = req.app.get('db');
     const categoriaId = req.params.id;
@@ -123,12 +118,9 @@ const mostrarCategoria = (req, res) => {
     });
 };
 
-// Função para mostrar um vídeo específico
 const mostrarVideo = (req, res) => {
     const db = req.app.get('db');
     const videoId = req.params.id;
-
-    console.log(`Acessando vídeo com ID: ${videoId}`);
 
     db.query('UPDATE videos SET contagem_visualizacoes = contagem_visualizacoes + 1 WHERE id = ?', [videoId], (erro) => {
         if (erro) {
@@ -154,7 +146,6 @@ const mostrarVideo = (req, res) => {
 
                 console.log('Caminho do arquivo de vídeo:', video[0].caminho_arquivo);
 
-                // Busca vídeos sugeridos (mesma categoria, exceto o vídeo atual)
                 db.query(
                     'SELECT v.*, u.nome AS nome_usuario FROM videos v LEFT JOIN usuarios u ON v.usuario_id = u.id LEFT JOIN video_categorias vc ON v.id = vc.video_id WHERE vc.categoria_id IN (SELECT categoria_id FROM video_categorias WHERE video_id = ?) AND v.id != ? ORDER BY RAND() LIMIT 5',
                     [videoId, videoId],
@@ -185,8 +176,6 @@ const mostrarVideo = (req, res) => {
                                         const likes = resultados?.find(r => r.tipo === 'like')?.total || 0;
                                         const deslikes = resultados?.find(r => r.tipo === 'deslike')?.total || 0;
 
-                                        console.log('Renderizando vídeo:', video[0]);
-
                                         res.render('video', {
                                             usuario: req.session.usuario,
                                             video: video[0],
@@ -207,7 +196,6 @@ const mostrarVideo = (req, res) => {
     });
 };
 
-// Função para adicionar um comentário
 const adicionarComentario = (req, res) => {
     if (!req.session.usuario) return res.redirect('/auth/login');
 
@@ -230,7 +218,6 @@ const adicionarComentario = (req, res) => {
     );
 };
 
-// Função para dar like em um vídeo
 const darLike = (req, res) => {
     if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
 
@@ -251,7 +238,6 @@ const darLike = (req, res) => {
     );
 };
 
-// Função para dar deslike em um vídeo
 const darDeslike = (req, res) => {
     if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
 
@@ -272,7 +258,6 @@ const darDeslike = (req, res) => {
     );
 };
 
-// Exportar todas as funções
 module.exports = {
     mostrarVideos,
     mostrarPublicar,

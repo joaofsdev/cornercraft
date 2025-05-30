@@ -10,15 +10,15 @@
     <nav class="bg-white p-4 flex justify-between items-center border-b">
         <a href="/"><h1 class="text-green-600 font-bold text-xl">Corner Craft</h1></a>
         <div>
-            <a href="/videos" class="text-gray-600 mr-4">Tutoriais</a>
+            <a href="/videos" class="text-gray-600 mr-4 hover:text-gray-700 hover:underline transition""">Tutoriais</a>
             <% if (usuario) { %>
-                <a href="/videos/publicar" class="text-gray-600 mr-4">Publicar</a>
+                <a href="/videos/publicar" class="text-gray-600 mr-4 hover:text-gray-700 hover:underline transition">Publicar</a>
                 <% if (usuario.papel === 'admin') { %>
-                    <a href="/admin" class="text-gray-600 mr-4">Painel ADM</a>
+                    <a href="/admin" class="text-gray-600 mr-4 hover:text-gray-700 hover:underline transition">Painel ADM</a>
                 <% } %>
-                <a href="/auth/logout" class="bg-green-600 text-white px-4 py-2 rounded">Sair</a>
+                <a href="/auth/logout" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Sair</a>
             <% } else { %>
-                <a href="/auth/login" class="bg-green-600 text-white px-4 py-2 rounded">Entrar</a>
+                <a href="/auth/login" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Entrar</a>
             <% } %>
         </div>
     </nav>

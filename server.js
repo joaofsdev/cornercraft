@@ -6,7 +6,6 @@ const path = require('path');
 const session = require('express-session');
 const authRotas = require('./routes/auth');
 const videosRotas = require('./routes/videos');
-const adminRotas = require('./routes/admin');
 
 dotenv.config();
 
@@ -52,7 +51,6 @@ app.set('db', conexao);
 
 app.use('/auth', authRotas);
 app.use('/videos', videosRotas);
-app.use('/admin', adminRotas);
 
 app.get('/', (req, res) => {
     const db = req.app.get('db');

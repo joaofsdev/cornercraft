@@ -1,5 +1,5 @@
 <%- include('partials/header') %>
-<div class="flex justify-center items-center h-screen bg-green-50">
+<div class="flex justify-center items-center min-h-screen bg-green-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 class="text-xl font-bold text-green-800 mb-4">Entrar no Corner Craft</h2>
         <form action="/auth/login" method="POST">
@@ -12,15 +12,15 @@
                 <input type="password" name="senha" class="w-full p-2 border rounded" placeholder="Sua senha" required>
             </div>
             <div class="mb-4">
-                <a href="#" class="text-green-600 text-sm">Esqueceu a senha?</a>
+                <a href="#" class="text-green-600 text-sm hover:text-green-700 hover:underline">Esqueceu a senha?</a>
             </div>
             <% if (erro) { %>
                 <p class="text-red-600 mb-4"><%= erro %></p>
             <% } %>
-            <button type="submit" class="w-full bg-green-600 text-white p-2 rounded">Entrar</button>
+            <button type="submit" class="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 transition">Entrar</button>
         </form>
         <p class="text-center mt-4">
-            Não tem uma conta? <a href="/auth/registrar" class="text-green-600">Cadastre-se</a>
+            Não tem uma conta? <a href="/auth/registrar" class="text-green-600 hover:text-green-700 hover:underline">Cadastre-se</a>
         </p>
         <p class="text-center text-gray-600 mt-4">
             Para facilitar os testes, você pode usar:<br>

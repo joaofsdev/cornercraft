@@ -8,7 +8,7 @@
             <% if (videos.length > 0) { %>
                 <% videos.forEach(video => { %>
                     <div class="bg-white rounded-lg shadow">
-                        <a href="/video/<%= video.id %>">
+                        <a href="/videos/video/<%= video.id %>">
                             <video class="w-full h-48 object-cover rounded-t-lg" src="<%= video.caminho_arquivo %>" muted></video>
                         </a>
                         <div class="p-4">

@@ -3,7 +3,6 @@ const router = express.Router();
 const videoController = require('../controllers/videoController');
 const upload = require('../middleware/upload');
 
-// Middleware para capturar erros do Multer
 const handleUpload = (req, res, next) => {
     upload.fields([{ name: 'video', maxCount: 1 }, { name: 'thumbnail', maxCount: 1 }])(req, res, (err) => {
         if (err) {
