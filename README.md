@@ -28,7 +28,6 @@
 - [Changelog](#-changelog)
 - [Possíveis Expansões Futuras](#-possíveis-expansões-futuras)
 - [Autor](#-autor)
-- [Licença](#-licença)
 - [Contato](#-contato)
 
 ---
@@ -280,14 +279,8 @@ Desenvolvido por **Joao Francisco da Silva** e **William Vodzinsky**, estudantes
 
 ---
 
-## 📝 Licença
-
-Este projeto está licenciado sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
 ## 📬 Contato
 
-- Email: joaofsdev@gmail.com
+- Email: joao.franciscos047@gmail.com
 - LinkedIn: [Joao Francisco da Silva](https://www.linkedin.com/in/joaofsdev/)
-- LinkedIn: [William Vodzinsky](https://www.linkedin.com/in/williamvodzinsky/)
+- LinkedIn: [William Vodzinsky](https://www.linkedin.com/in/william-vodzinsky-a3b346212/)
