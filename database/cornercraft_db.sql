@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 09/06/2025 às 22:40
+-- Tempo de geração: 24/06/2025 às 19:30
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -24,28 +24,37 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `avaliacoes`
+--
+
+CREATE TABLE `avaliacoes` (
+  `id` int(11) NOT NULL,
+  `video_id` int(11) DEFAULT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `nota` int(11) DEFAULT NULL CHECK (`nota` between 1 and 5),
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `categorias`
 --
 
-DROP TABLE IF EXISTS categorias;
-CREATE TABLE categorias (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  nome_categoria VARCHAR(100) NOT NULL UNIQUE,
-  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP(),
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `categorias` (
+  `id` int(11) NOT NULL,
+  `nome_categoria` varchar(100) NOT NULL,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `categorias`
 --
 
-INSERT INTO categorias (nome_categoria) VALUES
-('Pintura'),
-('Macramê'),
-('Bordado'),
-('Tricô'),
-('Crochê'),
-('Cerâmica');
+INSERT INTO `categorias` (`id`, `nome_categoria`, `criado_em`) VALUES
+(1, 'Crochê', '2025-06-24 11:30:48'),
+(3, 'Macramê', '2025-06-24 11:42:33'),
+(4, 'Cerâmica', '2025-06-24 11:42:43');
 
 -- --------------------------------------------------------
 
@@ -53,28 +62,21 @@ INSERT INTO categorias (nome_categoria) VALUES
 -- Estrutura para tabela `comentarios`
 --
 
-DROP TABLE IF EXISTS comentarios;
-CREATE TABLE comentarios (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  video_id INT(11) NOT NULL,
-  usuario_id INT(11) NOT NULL,
-  comentario TEXT NOT NULL,
-  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP(),
-  PRIMARY KEY (id),
-  KEY idx_video_id (video_id),
-  KEY idx_usuario_id (usuario_id),
-  CONSTRAINT fk_comentario_video FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
-  CONSTRAINT fk_comentario_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `comentarios` (
+  `id` int(11) NOT NULL,
+  `video_id` int(11) DEFAULT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `comentario` text NOT NULL,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `comentarios`
 --
 
-INSERT INTO comentarios (video_id, usuario_id, comentario) VALUES
-(1, 1, 'Ótimo tutorial!'),
-(1, 2, 'Muito bem explicado.'),
-(2, 3, 'Vídeo muito bom');
+INSERT INTO `comentarios` (`id`, `video_id`, `usuario_id`, `comentario`, `criado_em`) VALUES
+(1, 1, 1, 'Video Muito Bom!', '2025-06-24 11:37:07'),
+(2, 1, 2, 'Excelente Tutorial!', '2025-06-24 11:37:50');
 
 -- --------------------------------------------------------
 
@@ -82,28 +84,42 @@ INSERT INTO comentarios (video_id, usuario_id, comentario) VALUES
 -- Estrutura para tabela `likes`
 --
 
-DROP TABLE IF EXISTS likes;
-CREATE TABLE likes (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  video_id INT(11) NOT NULL,
-  usuario_id INT(11) NOT NULL,
-  tipo ENUM('like','deslike') NOT NULL,
-  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP(),
-  PRIMARY KEY (id),
-  UNIQUE KEY unique_like (video_id, usuario_id),
-  KEY idx_video_id (video_id),
-  KEY idx_usuario_id (usuario_id),
-  CONSTRAINT fk_like_video FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
-  CONSTRAINT fk_like_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `likes` (
+  `id` int(11) NOT NULL,
+  `video_id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `tipo` enum('like','deslike') NOT NULL,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `likes`
 --
 
-INSERT INTO likes (video_id, usuario_id, tipo) VALUES
-(1, 1, 'like'),
-(1, 2, 'deslike');
+INSERT INTO `likes` (`id`, `video_id`, `usuario_id`, `tipo`, `criado_em`) VALUES
+(1, 1, 1, 'like', '2025-06-24 11:36:48'),
+(4, 1, 2, 'like', '2025-06-24 11:37:43');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `projetos_concluidos`
+--
+
+CREATE TABLE `projetos_concluidos` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `video_id` int(11) DEFAULT NULL,
+  `foto_criacao` varchar(255) DEFAULT NULL,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `projetos_concluidos`
+--
+
+INSERT INTO `projetos_concluidos` (`id`, `usuario_id`, `video_id`, `foto_criacao`, `criado_em`) VALUES
+(6, 1, 1, '', '2025-06-24 11:52:43');
 
 -- --------------------------------------------------------
 
@@ -111,26 +127,23 @@ INSERT INTO likes (video_id, usuario_id, tipo) VALUES
 -- Estrutura para tabela `usuarios`
 --
 
-DROP TABLE IF EXISTS usuarios;
-CREATE TABLE usuarios (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  nome VARCHAR(100) NOT NULL,
-  email VARCHAR(100) NOT NULL UNIQUE,
-  senha VARCHAR(255) NOT NULL,
-  inscritos INT(11) DEFAULT 0,
-  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP(),
-  papel ENUM('usuario','admin') NOT NULL DEFAULT 'usuario',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  `papel` enum('usuario','admin') DEFAULT 'usuario',
+  `inscritos` int(11) DEFAULT 0,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `usuarios`
 --
 
-INSERT INTO usuarios (nome, email, senha, papel) VALUES
-('Maria Silva', 'maria@example.com', 'senha123', 'usuario'),
-('João Pereira', 'joao@example.com', 'senha456', 'usuario'),
-('Admin', 'admin@cornercraft.com', '$2b$10$AfXN6NDfXiJ6Q3k93PBdtuywKlOpKp85uVcsUshBrIGEhn0UjHuV.', 'admin');
+INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `papel`, `inscritos`, `criado_em`) VALUES
+(1, 'Admin', 'admin@cornercraft.com', '$2b$10$e2TAUp3yta3jBQevEWAGLOON4UNq8HPqPwiII.yi6X2B8Bs7SAGii', 'admin', 0, '2025-06-24 11:29:12'),
+(2, 'Teste', 'teste@cornercraft.com', '$2b$10$waUlCIVTelYwUQhZR9.VPOrbS4/aikCpxOHp36i1wsWTgzuZpFSW6', 'usuario', 0, '2025-06-24 11:37:27');
 
 -- --------------------------------------------------------
 
@@ -138,33 +151,24 @@ INSERT INTO usuarios (nome, email, senha, papel) VALUES
 -- Estrutura para tabela `videos`
 --
 
-DROP TABLE IF EXISTS videos;
-CREATE TABLE videos (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  usuario_id INT(11) NOT NULL,
-  titulo VARCHAR(255) NOT NULL,
-  descricao TEXT DEFAULT NULL,
-  caminho_arquivo VARCHAR(255) NOT NULL,
-  thumbnail VARCHAR(255) DEFAULT '/uploads/placeholder.jpg',
-  contagem_visualizacoes INT(11) DEFAULT 0,
-  likes INT(11) DEFAULT 0,
-  deslikes INT(11) DEFAULT 0,
-  aprovado BOOLEAN DEFAULT FALSE,
-  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP(),
-  PRIMARY KEY (id),
-  KEY idx_usuario_id (usuario_id),
-  KEY idx_criado_em (criado_em),
-  CONSTRAINT fk_videos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `videos` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) DEFAULT NULL,
+  `titulo` varchar(200) NOT NULL,
+  `descricao` text DEFAULT NULL,
+  `caminho_arquivo` varchar(255) DEFAULT NULL,
+  `thumbnail` varchar(255) DEFAULT '/uploads/placeholder.jpg',
+  `contagem_visualizacoes` int(11) DEFAULT 0,
+  `aprovado` tinyint(1) DEFAULT 0,
+  `criado_em` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `videos`
 --
 
-INSERT INTO videos (usuario_id, titulo, descricao, caminho_arquivo, thumbnail, aprovado) VALUES
-(1, 'Crochê Básico para Iniciantes', 'Tutorial básico de crochê', '/uploads/video1.mp4', '/uploads/thumbnail1.jpg', TRUE),
-(1, 'Macramê Simples', 'Como fazer macramê', '/uploads/video2.mp4', '/uploads/thumbnail2.jpg', TRUE),
-(2, 'Boneco de Palito', 'Brinquedo feito com palito de picolé', '/uploads/video3.mp4', '/uploads/thumbnail3.jpg', TRUE);
+INSERT INTO `videos` (`id`, `usuario_id`, `titulo`, `descricao`, `caminho_arquivo`, `thumbnail`, `contagem_visualizacoes`, `aprovado`, `criado_em`) VALUES
+(1, 1, 'Como fazer crochê iniciante', 'crochê iniciante', '/uploads/1750775483975-crocheIniciantes.mp4', '', 46, 1, '2025-06-24 11:31:23');
 
 -- --------------------------------------------------------
 
@@ -172,133 +176,172 @@ INSERT INTO videos (usuario_id, titulo, descricao, caminho_arquivo, thumbnail, a
 -- Estrutura para tabela `video_categorias`
 --
 
-DROP TABLE IF EXISTS video_categorias;
-CREATE TABLE video_categorias (
-  video_id INT(11) NOT NULL,
-  categoria_id INT(11) NOT NULL,
-  PRIMARY KEY (video_id, categoria_id),
-  KEY idx_video_id (video_id),
-  KEY idx_categoria_id (categoria_id),
-  CONSTRAINT fk_vc_video FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
-  CONSTRAINT fk_vc_categoria FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `video_categorias` (
+  `video_id` int(11) NOT NULL,
+  `categoria_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `video_categorias`
 --
 
-INSERT INTO video_categorias (video_id, categoria_id) VALUES
-(1, 5),
-(2, 2),
-(3, 5);
+INSERT INTO `video_categorias` (`video_id`, `categoria_id`) VALUES
+(1, 1);
 
 --
 -- Índices para tabelas despejadas
 --
 
 --
+-- Índices de tabela `avaliacoes`
+--
+ALTER TABLE `avaliacoes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `video_id` (`video_id`),
+  ADD KEY `usuario_id` (`usuario_id`);
+
+--
 -- Índices de tabela `categorias`
 --
-ALTER TABLE categorias
-  ADD UNIQUE KEY nome_categoria (`nome_categoria`);
+ALTER TABLE `categorias`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nome_categoria` (`nome_categoria`);
 
 --
 -- Índices de tabela `comentarios`
 --
-ALTER TABLE comentarios
-  ADD KEY idx_video_id (`video_id`),
-  ADD KEY idx_usuario_id (`usuario_id`);
+ALTER TABLE `comentarios`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `video_id` (`video_id`),
+  ADD KEY `usuario_id` (`usuario_id`);
 
 --
 -- Índices de tabela `likes`
 --
-ALTER TABLE likes
-  ADD KEY idx_video_id (`video_id`),
-  ADD KEY idx_usuario_id (`usuario_id`);
+ALTER TABLE `likes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_like` (`video_id`,`usuario_id`),
+  ADD KEY `usuario_id` (`usuario_id`);
+
+--
+-- Índices de tabela `projetos_concluidos`
+--
+ALTER TABLE `projetos_concluidos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`),
+  ADD KEY `video_id` (`video_id`);
 
 --
 -- Índices de tabela `usuarios`
 --
-ALTER TABLE usuarios
-  ADD UNIQUE KEY email (`email`);
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Índices de tabela `videos`
 --
-ALTER TABLE videos
-  ADD KEY idx_criado_em (`criado_em`);
+ALTER TABLE `videos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`);
 
 --
 -- Índices de tabela `video_categorias`
 --
-ALTER TABLE video_categorias
-  ADD KEY idx_video_id (`video_id`),
-  ADD KEY idx_categoria_id (`categoria_id`);
+ALTER TABLE `video_categorias`
+  ADD PRIMARY KEY (`video_id`,`categoria_id`),
+  ADD KEY `categoria_id` (`categoria_id`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas
 --
 
 --
+-- AUTO_INCREMENT de tabela `avaliacoes`
+--
+ALTER TABLE `avaliacoes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `categorias`
 --
-ALTER TABLE categorias
-  MODIFY id INT(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `categorias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de tabela `comentarios`
 --
-ALTER TABLE comentarios
-  MODIFY id INT(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `comentarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `likes`
 --
-ALTER TABLE likes
-  MODIFY id INT(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `likes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de tabela `projetos_concluidos`
+--
+ALTER TABLE `projetos_concluidos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
 --
-ALTER TABLE usuarios
-  MODIFY id INT(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de tabela `videos`
 --
-ALTER TABLE videos
-  MODIFY id INT(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `videos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Restrições para tabelas despejadas
 --
 
 --
+-- Restrições para tabelas `avaliacoes`
+--
+ALTER TABLE `avaliacoes`
+  ADD CONSTRAINT `avaliacoes_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videos` (`id`),
+  ADD CONSTRAINT `avaliacoes_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
+
+--
 -- Restrições para tabelas `comentarios`
 --
-ALTER TABLE comentarios
-  ADD CONSTRAINT comentarios_ibfk_1 FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE CASCADE,
-  ADD CONSTRAINT comentarios_ibfk_2 FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE;
+ALTER TABLE `comentarios`
+  ADD CONSTRAINT `comentarios_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videos` (`id`),
+  ADD CONSTRAINT `comentarios_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
 -- Restrições para tabelas `likes`
 --
-ALTER TABLE likes
-  ADD CONSTRAINT likes_ibfk_1 FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE CASCADE,
-  ADD CONSTRAINT likes_ibfk_2 FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE;
+ALTER TABLE `likes`
+  ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `projetos_concluidos`
+--
+ALTER TABLE `projetos_concluidos`
+  ADD CONSTRAINT `projetos_concluidos_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`),
+  ADD CONSTRAINT `projetos_concluidos_ibfk_2` FOREIGN KEY (`video_id`) REFERENCES `videos` (`id`);
 
 --
 -- Restrições para tabelas `videos`
 --
-ALTER TABLE videos
-  ADD CONSTRAINT videos_ibfk_1 FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE;
+ALTER TABLE `videos`
+  ADD CONSTRAINT `videos_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
 -- Restrições para tabelas `video_categorias`
 --
-ALTER TABLE video_categorias
-  ADD CONSTRAINT video_categorias_ibfk_1 FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE CASCADE,
-  ADD CONSTRAINT video_categorias_ibfk_2 FOREIGN KEY (categoria_id) REFERENCES categorias (id) ON DELETE CASCADE;
+ALTER TABLE `video_categorias`
+  ADD CONSTRAINT `video_categorias_ibfk_1` FOREIGN KEY (`video_id`) REFERENCES `videos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `video_categorias_ibfk_2` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
