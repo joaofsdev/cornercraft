@@ -1,7 +1,6 @@
 const { getPool } = require('../db');
 
 const criarThumbnail = (caminhoArquivo) => {
-    console.log('Gerando nome de thumbnail para:', caminhoArquivo);
     return `${caminhoArquivo}-thumbnail.jpg`;
 };
 
@@ -19,7 +18,6 @@ const salvarVideo = async (usuarioId, categorias, titulo, descricao, caminhoArqu
         if (valores.length > 0) {
             await db.query('INSERT INTO video_categorias (video_id, categoria_id) VALUES ?', [valores]);
         }
-        console.log('Vídeo salvo com ID:', videoId);
         return videoId;
     } catch (erro) {
         console.error('Erro ao salvar vídeo:', erro);
@@ -32,7 +30,6 @@ const buscarVideosPorCategoria = async (categoriaId) => {
     const query = 'SELECT v.*, u.nome AS nome_usuario FROM videos v JOIN usuarios u ON v.usuario_id = u.id JOIN video_categorias vc ON v.id = vc.video_id WHERE vc.categoria_id = ? AND v.aprovado = TRUE ORDER BY v.criado_em DESC';
     try {
         const [videos] = await db.query(query, [categoriaId]);
-        console.log('Vídeos encontrados por categoria:', videos.length);
         return videos;
     } catch (erro) {
         console.error('Erro ao buscar vídeos por categoria:', erro);
@@ -47,7 +44,6 @@ const marcarProjetoConcluido = async (usuarioId, videoId, fotoCriacao = '') => {
 
     try {
         await db.query(query, values);
-        console.log('Projeto marcado como concluído para usuário:', usuarioId, 'vídeo:', videoId);
     } catch (erro) {
         console.error('Erro ao marcar projeto concluído:', erro);
         throw erro;
@@ -59,7 +55,6 @@ const buscarVideoPorId = async (videoId) => {
     const query = 'SELECT v.*, u.nome AS nome_usuario FROM videos v JOIN usuarios u ON v.usuario_id = u.id WHERE v.id = ? AND v.aprovado = TRUE';
     try {
         const [videos] = await db.query(query, [videoId]);
-        console.log('Vídeo encontrado:', videos[0] ? videos[0].id : null);
         return videos[0] || null;
     } catch (erro) {
         console.error('Erro ao buscar vídeo por ID:', erro);

@@ -3,12 +3,10 @@ const path = require('path');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log('Definindo destino do upload:', process.env.UPLOAD_PATH);
     cb(null, process.env.UPLOAD_PATH || './public/uploads');
   },
   filename: (req, file, cb) => {
     const nomeUnico = `${Date.now()}-${file.originalname}`;
-    console.log('Nome do arquivo gerado:', nomeUnico);
     cb(null, nomeUnico);
   },
 });
@@ -20,7 +18,6 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     const extensao = path.extname(file.originalname).toLowerCase();
-    console.log('Arquivo recebido:', file.fieldname, 'Extensão:', extensao);
 
     if (file.fieldname === 'video') {
       const extensoesPermitidas = ['.mp4'];

@@ -1,7 +1,6 @@
 const path = require('path');
 
 const mostrarVideos = async (req, res) => {
-    console.log('--- Iniciando videoController.mostrarVideos ---');
     const db = req.app.get('db');
     const categoriaSelecionada = req.query.categoria || '';
     const usuarioId = req.session.usuario ? req.session.usuario.id : null;
@@ -24,8 +23,6 @@ const mostrarVideos = async (req, res) => {
             const [concluidosRows] = await db.query('SELECT video_id FROM projetos_concluidos WHERE usuario_id = ?', [usuarioId]);
             concluidos = concluidosRows.map(row => row.video_id);
         }
-        console.log('Categorias recuperadas:', categorias.map(c => c.nome_categoria));
-        if (!categorias.length) console.log('Nenhuma categoria encontrada no banco!');
         res.render('videos', { usuario: req.session.usuario, videos, categorias, categoriaSelecionada, erro: null, concluidos });
     } catch (erro) {
         console.error('Erro ao buscar vídeos ou categorias:', erro);
@@ -34,15 +31,12 @@ const mostrarVideos = async (req, res) => {
 };
 
 const mostrarPublicar = async (req, res) => {
-    console.log('--- Iniciando videoController.mostrarPublicar ---');
     if (!req.session.usuario) {
         return res.redirect('/auth/login');
     }
     const db = req.app.get('db');
     try {
         const [categorias] = await db.query('SELECT * FROM categorias');
-        console.log('Categorias para publicação:', categorias.map(c => c.nome_categoria));
-        if (!categorias.length) console.log('Nenhuma categoria disponível para publicação!');
         res.render('publicar', { usuario: req.session.usuario, categorias, erro: null });
     } catch (erro) {
         console.error('Erro ao buscar categorias:', erro);
@@ -51,7 +45,6 @@ const mostrarPublicar = async (req, res) => {
 };
 
 const processarPublicar = async (req, res) => {
-    console.log('--- Iniciando videoController.processarPublicar ---');
     if (!req.session.usuario) {
         return res.redirect('/auth/login');
     }
@@ -79,11 +72,9 @@ const processarPublicar = async (req, res) => {
         let categoriasArray = Array.isArray(categorias) ? categorias : [categorias];
         categoriasArray = categoriasArray.map((catId) => Number(catId));
         const valores = categoriasArray.map((catId) => [videoId, catId]);
-        console.log('Valores para video_categorias:', valores);
         if (valores.length > 0) {
             await db.query('INSERT INTO video_categorias (video_id, categoria_id) VALUES ?', [valores]);
         }
-        console.log('Vídeo publicado com sucesso:', videoId);
         res.redirect('/videos');
     } catch (erro) {
         console.error('Erro ao processar publicação:', erro);
@@ -92,7 +83,6 @@ const processarPublicar = async (req, res) => {
 };
 
 const mostrarCategoria = async (req, res) => {
-    console.log('--- Iniciando videoController.mostrarCategoria ---');
     const db = req.app.get('db');
     const categoriaId = req.params.id;
     const usuarioId = req.session.usuario ? req.session.usuario.id : null;
@@ -100,10 +90,8 @@ const mostrarCategoria = async (req, res) => {
     try {
         const [categoria] = await db.query('SELECT * FROM categorias WHERE id = ?', [categoriaId]);
         if (!categoria.length) {
-            console.log(`Categoria com ID ${categoriaId} não encontrada`);
             return res.status(404).render('categoria', { usuario: req.session.usuario, videos: [], categoria: null, erro: 'Categoria não encontrada', concluidos: [] });
         }
-        console.log('Categoria encontrada:', categoria[0].nome_categoria);
 
         let [videos] = await db.query(
             'SELECT v.*, u.nome AS nome_usuario FROM videos v JOIN usuarios u ON v.usuario_id = u.id JOIN video_categorias vc ON v.id = vc.video_id WHERE vc.categoria_id = ? AND v.aprovado = TRUE ORDER BY v.criado_em DESC',
@@ -114,7 +102,6 @@ const mostrarCategoria = async (req, res) => {
             const [concluidosRows] = await db.query('SELECT video_id FROM projetos_concluidos WHERE usuario_id = ?', [usuarioId]);
             concluidos = concluidosRows.map(row => row.video_id);
         }
-        if (!videos.length) console.log('Nenhum vídeo encontrado para esta categoria');
         res.render('categoria', { usuario: req.session.usuario, videos, categoria: categoria[0], erro: null, concluidos });
     } catch (erro) {
         console.error('Erro ao buscar categoria ou vídeos:', erro);
@@ -123,7 +110,6 @@ const mostrarCategoria = async (req, res) => {
 };
 
 const mostrarVideo = async (req, res) => {
-    console.log('--- Iniciando videoController.mostrarVideo ---');
     const db = req.app.get('db');
     const videoId = req.params.id;
     const usuarioId = req.session.usuario ? req.session.usuario.id : null;
@@ -160,7 +146,6 @@ const mostrarVideo = async (req, res) => {
         const likes = resultados?.find((r) => r.tipo === 'like')?.total || 0;
         const deslikes = resultados?.find((r) => r.tipo === 'deslike')?.total || 0;
 
-        console.log('Vídeo carregado:', video[0].id);
         res.render('video', { usuario: req.session.usuario, video: video[0], videosSugeridos, comentarios, likes, deslikes, erro: null, concluido });
     } catch (erro) {
         console.error('Erro ao carregar vídeo:', erro);
@@ -169,7 +154,6 @@ const mostrarVideo = async (req, res) => {
 };
 
 const adicionarComentario = async (req, res) => {
-    console.log('--- Iniciando videoController.adicionarComentario ---');
     if (!req.session.usuario) return res.redirect('/auth/login');
 
     const videoId = req.params.id;
@@ -181,7 +165,6 @@ const adicionarComentario = async (req, res) => {
     const db = req.app.get('db');
     try {
         await db.query('INSERT INTO comentarios (video_id, usuario_id, comentario, criado_em) VALUES (?, ?, ?, NOW())', [videoId, usuarioId, comentario]);
-        console.log('Comentário adicionado com sucesso');
         res.redirect(`/videos/video/${videoId}`);
     } catch (erro) {
         console.error('Erro ao adicionar comentário:', erro);
@@ -190,7 +173,6 @@ const adicionarComentario = async (req, res) => {
 };
 
 const darLike = async (req, res) => {
-    console.log('--- Iniciando videoController.darLike ---');
     if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
 
     const videoId = req.params.id;
@@ -199,7 +181,6 @@ const darLike = async (req, res) => {
     const db = req.app.get('db');
     try {
         await db.query('INSERT INTO likes (video_id, usuario_id, tipo) VALUES (?, ?, "like") ON DUPLICATE KEY UPDATE tipo = "like"', [videoId, usuarioId]);
-        console.log('Like adicionado com sucesso');
         res.json({ success: true });
     } catch (erro) {
         console.error('Erro ao adicionar like:', erro);
@@ -208,7 +189,6 @@ const darLike = async (req, res) => {
 };
 
 const darDeslike = async (req, res) => {
-    console.log('--- Iniciando videoController.darDeslike ---');
     if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
 
     const videoId = req.params.id;
@@ -217,7 +197,6 @@ const darDeslike = async (req, res) => {
     const db = req.app.get('db');
     try {
         await db.query('INSERT INTO likes (video_id, usuario_id, tipo) VALUES (?, ?, "deslike") ON DUPLICATE KEY UPDATE tipo = "deslike"', [videoId, usuarioId]);
-        console.log('Deslike adicionado com sucesso');
         res.json({ success: true });
     } catch (erro) {
         console.error('Erro ao adicionar deslike:', erro);
@@ -226,7 +205,6 @@ const darDeslike = async (req, res) => {
 };
 
 const marcarProjetoConcluido = async (req, res) => {
-    console.log('--- Iniciando videoController.marcarProjetoConcluido ---');
     if (!req.session.usuario) return res.json({ success: false, message: 'Usuário não autenticado' });
 
     const videoId = req.body.videoId;
@@ -235,7 +213,6 @@ const marcarProjetoConcluido = async (req, res) => {
     const db = req.app.get('db');
     try {
         await db.query('INSERT INTO projetos_concluidos (usuario_id, video_id, foto_criacao) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE foto_criacao = ?', [usuarioId, videoId, '', '']);
-        console.log('Projeto marcado como concluído:', { usuarioId, videoId });
         res.json({ success: true });
     } catch (erro) {
         console.error('Erro ao marcar projeto concluído:', erro);
@@ -244,7 +221,6 @@ const marcarProjetoConcluido = async (req, res) => {
 };
 
 const uploadFotoCriacao = async (req, res) => {
-    console.log('--- Iniciando videoController.uploadFotoCriacao ---');
     if (!req.session.usuario) return res.redirect('/auth/login');
 
     const videoId = req.params.id;
@@ -254,7 +230,6 @@ const uploadFotoCriacao = async (req, res) => {
     const db = req.app.get('db');
     try {
         await db.query('INSERT INTO projetos_concluidos (usuario_id, video_id, foto_criacao) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE foto_criacao = ?', [usuarioId, videoId, foto, foto]);
-        console.log('Foto de criação enviada com sucesso:', { usuarioId, videoId, foto });
         res.redirect(`/videos/video/${videoId}`);
     } catch (erro) {
         console.error('Erro ao upload de foto:', erro);
