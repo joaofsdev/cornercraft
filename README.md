@@ -1,8 +1,7 @@
 # 🎥 Corner Craft – Plataforma de Vídeos Personalizados
 
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E=18.0.0-brightgreen)](https://nodejs.org/)
-[![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)]()
+[![Status](https://img.shields.io/badge/status-finalizado-green)]()
 
 **Corner Craft** é uma aplicação web interativa para publicar, assistir e interagir com vídeos personalizados. Ideal para criadores de conteúdo e comunidades que desejam compartilhar e engajar-se com vídeos de forma simples e eficiente.
 
