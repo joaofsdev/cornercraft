@@ -122,17 +122,19 @@ exports.aprovarVideo = (req, res) => {
         });
 };
 
-exports.banirUsuario = (req, res) => {
+exports.banirUsuario = async (req, res) => {
     const usuarioId = req.params.id;
     const db = req.app.get('db');
-    db.query('DELETE FROM usuarios WHERE id = ?', [usuarioId])
-        .then(() => {
-            res.redirect('/admin/moderar');
-        })
-        .catch((err) => {
-            console.error('Erro ao banir usuário:', err);
-            res.redirect('/admin/moderar');
-        });
+    try {
+        // Deleta os comentários do usuário primeiro
+        await db.query('DELETE FROM comentarios WHERE usuario_id = ?', [usuarioId]);
+        // Agora deleta o usuário
+        await db.query('DELETE FROM usuarios WHERE id = ?', [usuarioId]);
+        res.redirect('/admin/moderar');
+    } catch (err) {
+        console.error('Erro ao banir usuário:', err);
+        res.redirect('/admin/moderar');
+    }
 };
 
 exports.editarCategoria = (req, res) => {
