@@ -130,10 +130,10 @@ exports.banirUsuario = async (req, res) => {
         await db.query('DELETE FROM comentarios WHERE usuario_id = ?', [usuarioId]);
         // Agora deleta o usuário
         await db.query('DELETE FROM usuarios WHERE id = ?', [usuarioId]);
-        res.redirect('/admin/moderar');
+            res.redirect('/admin/moderar');
     } catch (err) {
-        console.error('Erro ao banir usuário:', err);
-        res.redirect('/admin/moderar');
+            console.error('Erro ao banir usuário:', err);
+            res.redirect('/admin/moderar');
     }
 };
 
