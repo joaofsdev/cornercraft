@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+<div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-8 px-2">
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+        <% if (erro) { %>
+            <div class="mb-6">
+                <p class="text-red-600 bg-red-100 border border-red-300 rounded-lg px-4 py-2 text-center text-base font-medium shadow"> <%= erro %> </p>
+            </div>
+        <% } else if (video) { %>
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-6 text-center tracking-tight"><%= video.titulo %></h2>
+            <div class="w-full max-w-2xl mx-auto aspect-w-16 aspect-h-9 mb-6 rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-black flex items-center justify-center">
+                <video controls class="w-full h-full object-contain bg-black" style="aspect-ratio: 16/9; background: #000;" src="<%= video.caminho_arquivo %>">
+                    Seu navegador não suporta o elemento de vídeo.
+                </video>
+            </div>
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
+                <p class="text-gray-600">Por <span class="font-semibold"><%= video.nome_usuario %></span> | Categoria: <span class="font-semibold"><%= video.categoria %></span></p>
+                <p class="text-gray-600">Visualizações: <span class="font-semibold"><%= video.contagem_visualizacoes %></span></p>
+            </div>
+            <div class="flex flex-wrap gap-4 mb-8 justify-center">
+                <button onclick="darLike('<%= video.id %>')" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 shadow focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50 transition">Like (<%= likes %>)</button>
+                <button onclick="darDeslike('<%= video.id %>')" class="bg-red-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-600 shadow focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50 transition">Deslike (<%= deslikes %>)</button>
+                <% if (usuario) { %>
+                    <% if (concluido) { %>
+                        <button id="btn-concluir" class="bg-gray-400 text-white px-6 py-2 rounded-lg font-bold cursor-not-allowed" disabled>Concluído</button>
+                    <% } else { %>
+                        <button id="btn-concluir" onclick="marcarProjeto('<%= video.id %>')" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 shadow focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50 transition">Marcar Concluído</button>
+                    <% } %>
+                <% } %>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Comentários</h3>
+            <ul class="space-y-4 mb-6">
+                <% comentarios.forEach(comentario => { %>
+                    <li class="p-4 bg-gray-50 rounded-xl shadow border border-gray-200">
+                        <p class="text-gray-800 font-semibold mb-1"><%= comentario.nome_usuario %>:</p>
+                        <p class="text-gray-600"><%= comentario.comentario %></p>
+                    </li>
+                <% }) %>
+            </ul>
+            <form action="/videos/video/<%= video.id %>/comentario" method="POST" class="space-y-4 mb-8">
+                <% if (usuario) { %>
+                    <textarea name="comentario" placeholder="Adicione um comentário..." class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-green-400 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 px-4 py-2 text-lg resize-none transition" required></textarea>
+                    <button type="submit" class="bg-green-500 text-white px-8 py-3 rounded-xl text-lg font-bold hover:bg-green-600 shadow focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50 transition">Comentar</button>
+                <% } else { %>
+                    <p class="text-gray-600">Faça login para comentar.</p>
+                <% } %>
+            </form>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Sugestões</h3>
+            <ul class="space-y-4">
+                <% videosSugeridos.forEach(sug => { %>
+                    <li class="flex justify-between items-center p-4 bg-gray-50 rounded-xl shadow border border-gray-200 hover:shadow-2xl transition">
+                        <a href="/videos/video/<%= sug.id %>" class="text-gray-800 font-semibold hover:text-green-600 transition"><%= sug.titulo %> <span class="text-gray-500 font-normal">(por <%= sug.nome_usuario %>)</span></a>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } %>
+    </div>
+</div>
+<script>
+    function darLike(videoId) { fetch(`/videos/video/${videoId}/like`, { method: 'POST' }).then(() => location.reload()); }
+    function darDeslike(videoId) { fetch(`/videos/video/${videoId}/deslike`, { method: 'POST' }).then(() => location.reload()); }
+    function marcarProjeto(videoId) {
+        fetch('/videos/marcar-projeto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoId })
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                const btn = document.getElementById('btn-concluir');
+                btn.textContent = 'Concluído';
+                btn.disabled = true;
+                btn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            } else {
+                alert('Erro ao marcar.');
+            }
+        });
+    }
+</script>
+<%- include('partials/footer') %>

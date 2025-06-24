@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+    <div class="bg-gray-100 flex flex-col items-center justify-center p-6">
+        <div class="text-center max-w-2xl">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Aprenda e Compartilhe Artesanato</h2>
+            <p class="text-gray-600 mb-6">
+                Tutoriais em vídeo para aprender diferentes técnicas de artesanato brasileiro. Compartilhe suas criações
+                e conecte-se com outros artesãos.
+            </p>
+            <a href="/videos"
+                class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 text-lg font-semibold">Explorar
+                Tutoriais</a>
+        </div>
+
+        <div class="mt-12 w-full max-w-3xl">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Categorias</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
+                <% if (categorias && categorias.length > 0) { %>
+                    <% categorias.forEach(categoria => { %>
+                        <a href="/videos/categoria/<%= categoria.id %>"
+                            class="text-center hover:bg-gray-200 p-4 rounded-lg transition">
+                            <div class="w-16 h-16 mx-auto mb-2 flex items-center justify-center">
+                                <% if (categoria.nome_categoria === 'Crochê') { %>
+                                    <span class="text-2xl">🧶</span>
+                                <% } else if (categoria.nome_categoria === 'Tricô') { %>
+                                    <span class="text-2xl">🧵</span>
+                                <% } else if (categoria.nome_categoria === 'Bordado') { %>
+                                    <span class="text-2xl">✂️</span>
+                                <% } else if (categoria.nome_categoria === 'Macramê') { %>
+                                    <span class="text-2xl">🌿</span>
+                                <% } else if (categoria.nome_categoria === 'Cerâmica') { %>
+                                    <span class="text-2xl">🏺</span>
+                                <% } else if (categoria.nome_categoria === 'Pintura') { %>
+                                    <span class="text-2xl">🎨</span>
+                                <% } %>
+                            </div>
+                            <p class="text-gray-800 font-medium">
+                                <%= categoria.nome_categoria %>
+                            </p>
+                        </a>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-gray-600">Nenhuma categoria disponível.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <%- include('partials/footer') %>

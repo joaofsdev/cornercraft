@@ -1,0 +1,5 @@
+uploads/
+.env
+node_modules/
+test/
+.nyc_output/
