@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+<div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center py-8 px-2">
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+        <h2 class="text-4xl font-extrabold text-gray-800 mb-8 text-center tracking-tight">Gerenciar Categorias</h2>
+        <% if (erro) { %>
+            <div class="mb-6">
+                <p class="text-red-600 bg-red-100 border border-red-300 rounded-lg px-4 py-2 text-center text-base font-medium shadow"> <%= erro %> </p>
+            </div>
+        <% } %>
+        <form action="/admin/adicionar-categoria" method="POST" class="mb-10 flex flex-col md:flex-row justify-center gap-4 items-center">
+            <input type="text" name="nome_categoria" placeholder="Nova Categoria" class="w-full md:w-1/2 rounded-lg border border-gray-300 shadow-sm focus:border-green-400 focus:ring-2 focus:ring-green-200 focus:ring-opacity-50 px-4 py-2 text-lg transition" required>
+            <button type="submit" class="bg-green-500 text-white px-8 py-3 rounded-xl hover:bg-green-600 text-lg font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50 transition">Adicionar</button>
+        </form>
+        <ul class="space-y-6">
+            <% categorias.forEach(categoria => { %>
+                <li class="flex flex-col md:flex-row md:justify-between md:items-center p-6 bg-gray-50 rounded-xl shadow-lg border border-gray-200 hover:shadow-2xl transition">
+                    <span class="text-gray-800 font-semibold text-lg"><%= categoria.nome_categoria %></span>
+                    <div id="botoes-categoria-<%= categoria.id %>" class="flex gap-2 mt-4 md:mt-0">
+                        <button onclick="mostrarEditar('<%= categoria.id %>', '<%= categoria.nome_categoria %>')" class="bg-yellow-400 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-500 shadow focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50 transition">Editar</button>
+                        <form action="/admin/excluir-categoria/<%= categoria.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta categoria?');">
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-600 shadow focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50 transition">Excluir</button>
+                        </form>
+                    </div>
+                    <form id="form-editar-<%= categoria.id %>" action="/admin/editar-categoria/<%= categoria.id %>" method="POST" class="hidden mt-4 md:mt-0 w-full md:w-auto flex flex-col md:flex-row gap-2 items-center">
+                        <input type="text" name="nome_categoria" value="<%= categoria.nome_categoria %>" class="w-full md:w-64 rounded-lg border border-gray-300 shadow-sm focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 focus:ring-opacity-50 px-4 py-2 text-lg transition" required>
+                        <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-yellow-600 shadow focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50 transition">Salvar</button>
+                        <button type="button" onclick="ocultarEditar('<%= categoria.id %>')" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold hover:bg-gray-400 shadow focus:outline-none transition">Cancelar</button>
+                    </form>
+                </li>
+            <% }) %>
+        </ul>
+    </div>
+</div>
+<script>
+    function mostrarEditar(id, nome) {
+        document.querySelectorAll('[id^="form-editar-"]').forEach(f => f.classList.add('hidden'));
+        document.querySelectorAll('[id^="botoes-categoria-"]').forEach(b => b.classList.remove('hidden'));
+        document.getElementById('form-editar-' + id).classList.remove('hidden');
+        document.getElementById('botoes-categoria-' + id).classList.add('hidden');
+    }
+    function ocultarEditar(id) {
+        document.getElementById('form-editar-' + id).classList.add('hidden');
+        document.getElementById('botoes-categoria-' + id).classList.remove('hidden');
+    }
+</script>
+<%- include('partials/footer') %>

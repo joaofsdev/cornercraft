@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<main class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-md">
+        <!-- Ícone de erro -->
+        <div class="mb-8">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-red-100 rounded-full">
+                <span class="text-5xl">🔍</span>
+            </div>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <h1 class="text-6xl font-bold text-gray-900 mb-4">404</h1>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Página não encontrada</h2>
+        <p class="text-gray-600 mb-8">
+            Desculpe, não conseguimos encontrar a página que você está procurando. 
+            Ela pode ter sido movida ou não existe mais.
+        </p>
+
+        <!-- Botões de ação -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/" 
+               class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg">
+                Voltar para Home
+            </a>
+            <a href="/videos" 
+               class="inline-block bg-white text-green-600 px-6 py-3 rounded-lg border-2 border-green-600 hover:bg-green-50 transition-colors font-semibold">
+                Ver Tutoriais
+            </a>
+        </div>
+
+        <!-- Link de suporte -->
+        <p class="mt-8 text-sm text-gray-500">
+            Precisa de ajuda? 
+            <a href="/" class="text-green-600 hover:text-green-700 hover:underline font-medium">
+                Entre em contato
+            </a>
+        </p>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

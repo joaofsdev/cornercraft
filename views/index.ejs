@@ -1,0 +1,133 @@
+<%- include('partials/header') %>
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-green-50 to-green-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div class="text-center max-w-3xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Aprenda e Compartilhe Artesanato
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 mb-8">
+                Descubra tutoriais em vídeo para aprender diferentes técnicas de artesanato brasileiro. 
+                Compartilhe suas criações e conecte-se com outros artesãos.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/videos" 
+                   class="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors shadow-lg hover:shadow-xl">
+                    Explorar Tutoriais
+                </a>
+                <% if (usuario) { %>
+                    <a href="/videos/publicar" 
+                       class="bg-white text-green-600 px-8 py-4 rounded-lg border-2 border-green-600 hover:bg-green-50 text-lg font-semibold transition-colors">
+                        Publicar Tutorial
+                    </a>
+                <% } else { %>
+                    <a href="/auth/registrar" 
+                       class="bg-white text-green-600 px-8 py-4 rounded-lg border-2 border-green-600 hover:bg-green-50 text-lg font-semibold transition-colors">
+                        Começar Agora
+                    </a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categorias Section -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Categorias de Artesanato</h2>
+            <p class="text-lg text-gray-600">Explore diferentes técnicas e estilos de artesanato</p>
+        </div>
+
+        <% if (categorias && categorias.length > 0) { %>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+                <% categorias.forEach(categoria => { %>
+                    <a href="/videos/categoria/<%= categoria.id %>" 
+                       class="group bg-gray-50 hover:bg-green-50 p-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg border border-gray-200 hover:border-green-300">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-16 h-16 mb-3 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform">
+                                <% if (categoria.nome_categoria.toLowerCase().includes('crochê') || categoria.nome_categoria.toLowerCase().includes('croche')) { %>
+                                    🧶
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('tricô') || categoria.nome_categoria.toLowerCase().includes('trico')) { %>
+                                    🧵
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('bordado')) { %>
+                                    ✂️
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('macramê') || categoria.nome_categoria.toLowerCase().includes('macrame')) { %>
+                                    🌿
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('cerâmica') || categoria.nome_categoria.toLowerCase().includes('ceramica')) { %>
+                                    🏺
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('pintura')) { %>
+                                    🎨
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('costura')) { %>
+                                    🪡
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('origami')) { %>
+                                    📄
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('decoupage')) { %>
+                                    🖌️
+                                <% } else if (categoria.nome_categoria.toLowerCase().includes('bijuteria')) { %>
+                                    💎
+                                <% } else { %>
+                                    ✨
+                                <% } %>
+                            </div>
+                            <p class="text-gray-900 font-semibold group-hover:text-green-700 transition-colors">
+                                <%= categoria.nome_categoria %>
+                            </p>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="text-center py-12">
+                <p class="text-gray-500 text-lg">Nenhuma categoria disponível no momento.</p>
+            </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Por que escolher Corner Craft?</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="text-center p-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">📚</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Tutoriais Completos</h3>
+                <p class="text-gray-600">
+                    Aprenda passo a passo com vídeos detalhados e de qualidade
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="text-center p-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">👥</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Comunidade Ativa</h3>
+                <p class="text-gray-600">
+                    Conecte-se com outros artesãos e compartilhe suas criações
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="text-center p-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">🎯</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Gratuito</h3>
+                <p class="text-gray-600">
+                    Acesso completo a todos os tutoriais sem custo algum
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

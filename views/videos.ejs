@@ -1,0 +1,134 @@
+<%- include('partials/header') %>
+
+<main class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header da página -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Tutoriais de Artesanato</h1>
+            <p class="text-lg text-gray-600">Explore e aprenda novas técnicas com nossa comunidade</p>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <% if (erro) { %>
+            <div class="max-w-3xl mx-auto mb-6 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                <p class="text-red-700 text-sm font-medium text-center"><%= erro %></p>
+            </div>
+        <% } %>
+
+        <!-- Filtro de categorias -->
+        <div class="max-w-3xl mx-auto mb-8">
+            <form action="/videos" method="GET" class="flex flex-col sm:flex-row gap-4 items-center">
+                <label for="categoria" class="text-gray-700 font-semibold whitespace-nowrap">
+                    Filtrar por:
+                </label>
+                <select 
+                    id="categoria"
+                    name="categoria" 
+                    onchange="this.form.submit()" 
+                    class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none">
+                    <option value="">📚 Todas as Categorias</option>
+                    <% categorias.forEach(categoria => { %>
+                        <option value="<%= categoria.id %>" <%= categoriaSelecionada == categoria.id ? 'selected' : '' %>>
+                            <%= categoria.nome_categoria %>
+                        </option>
+                    <% }) %>
+                </select>
+            </form>
+        </div>
+
+        <!-- Lista de vídeos -->
+        <div class="max-w-5xl mx-auto">
+            <% if (videos.length === 0) { %>
+                <div class="text-center py-16">
+                    <div class="inline-block w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-3xl">🎨</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum tutorial encontrado</h3>
+                    <p class="text-gray-600 mb-6">
+                        <% if (categoriaSelecionada) { %>
+                            Não há tutoriais nesta categoria ainda.
+                        <% } else { %>
+                            Seja o primeiro a publicar um tutorial!
+                        <% } %>
+                    </p>
+                    <% if (usuario) { %>
+                        <a href="/videos/publicar" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                            Publicar Tutorial
+                        </a>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <% videos.forEach(video => { %>
+                        <article class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                            <a href="/videos/video/<%= video.id %>" class="block p-6">
+                                <!-- Título e autor -->
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2 hover:text-green-600 transition-colors">
+                                    <%= video.titulo %>
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-4">
+                                    Por <span class="font-medium"><%= video.nome_usuario %></span>
+                                </p>
+
+                                <!-- Visualizações -->
+                                <% if (video.contagem_visualizacoes) { %>
+                                    <div class="flex items-center text-sm text-gray-500 mb-4">
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <%= video.contagem_visualizacoes %> visualizações
+                                    </div>
+                                <% } %>
+                            </a>
+
+                            <!-- Ação de marcar como concluído -->
+                            <% if (usuario) { %>
+                                <div class="px-6 pb-6">
+                                    <% if (concluidos && concluidos.includes(video.id)) { %>
+                                        <div class="flex items-center justify-center bg-green-50 text-green-700 px-4 py-3 rounded-lg border border-green-200">
+                                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <span class="font-medium">Projeto concluído</span>
+                                        </div>
+                                    <% } else { %>
+                                        <button 
+                                            onclick="marcarProjeto('<%= video.id %>')" 
+                                            class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                                            ✓ Marcar como Concluído
+                                        </button>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        </article>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</main>
+
+<script>
+    async function marcarProjeto(videoId) {
+        try {
+            const response = await fetch('/videos/marcar-projeto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ videoId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                location.reload();
+            } else {
+                console.error('Erro ao marcar projeto');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    }
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Corner Craft - Plataforma de tutoriais">
+    <title>Corner Craft - Tutoriais</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Navegação Principal -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-2 group" aria-label="Página inicial">
+                    <h1 class="text-green-600 font-bold text-xl group-hover:text-green-700 transition-colors">
+                        Corner Craft
+                    </h1>
+                </a>
+
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="/videos" 
+                       class="text-gray-600 px-3 py-2 rounded-md hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                        Tutoriais
+                    </a>
+                    
+                    <% if (usuario) { %>
+                        <a href="/videos/publicar" 
+                           class="text-gray-600 px-3 py-2 rounded-md hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                            Publicar
+                        </a>
+                        
+                        <% if (usuario.papel === 'admin') { %>
+                            <a href="/admin" 
+                               class="text-gray-600 px-3 py-2 rounded-md hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                                Painel ADM
+                            </a>
+                        <% } %>
+                        
+                        <span class="text-gray-500 px-2">|</span>
+                        <span class="text-gray-700 px-2">Olá, <%= usuario.nome %></span>
+                        
+                        <a href="/auth/logout" 
+                           class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors ml-2">
+                            Sair
+                        </a>
+                    <% } else { %>
+                        <a href="/auth/login" 
+                           class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors ml-2">
+                            Entrar
+                        </a>
+                        <a href="/auth/registrar" 
+                           class="text-green-600 px-4 py-2 rounded-md border border-green-600 hover:bg-green-50 transition-colors ml-2">
+                            Registrar
+                        </a>
+                    <% } %>
+                </div>
+
+                <!-- Menu Mobile Button -->
+                <button id="mobile-menu-button" 
+                        class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                        aria-label="Abrir menu"
+                        aria-expanded="false">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="/videos" 
+                   class="block text-gray-600 px-3 py-2 rounded-md hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                    Tutoriais
+                </a>
+                
+                <% if (usuario) { %>
+                    <a href="/videos/publicar" 
+                       class="block text-gray-600 px-3 py-2 rounded-md hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                        Publicar
+                    </a>
+                    
+                    <% if (usuario.papel === 'admin') { %>
+                        <a href="/admin" 
+                           class="block text-gray-600 px-3 py-2 rounded-md hover:text-gray-900 hover:bg-gray-100 transition-colors">
+                            Painel ADM
+                        </a>
+                    <% } %>
+                    
+                    <div class="border-t border-gray-200 my-2"></div>
+                    <div class="px-3 py-2 text-gray-700">Olá, <%= usuario.nome %></div>
+                    
+                    <a href="/auth/logout" 
+                       class="block text-center bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors">
+                        Sair
+                    </a>
+                <% } else { %>
+                    <a href="/auth/login" 
+                       class="block text-center bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors">
+                        Entrar
+                    </a>
+                    <a href="/auth/registrar" 
+                       class="block text-center text-green-600 px-3 py-2 rounded-md border border-green-600 hover:bg-green-50 transition-colors mt-2">
+                        Registrar
+                    </a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Toggle mobile menu
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
